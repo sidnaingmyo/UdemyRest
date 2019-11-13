@@ -1,8 +1,8 @@
-package com.example.demo.Security;
+package com.example.demo.security;
 
-import com.example.demo.Dto.UserDto;
-import com.example.demo.Request.UserLoginRequestModel;
-import com.example.demo.Service.UserService;
+import com.example.demo.dto.UserDto;
+import com.example.demo.request.UserLoginRequestModel;
+import com.example.demo.service.UserService;
 import com.example.demo.SpringApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;

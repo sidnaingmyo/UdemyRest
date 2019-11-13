@@ -1,6 +1,5 @@
-package com.example.demo.Dto;
+package com.example.demo.dto;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

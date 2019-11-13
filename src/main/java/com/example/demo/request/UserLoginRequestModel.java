@@ -1,4 +1,4 @@
-package com.example.demo.Response;
+package com.example.demo.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,10 +7,8 @@ import lombok.Setter;
 
 @Getter @Setter
 @AllArgsConstructor @NoArgsConstructor
-public class UserRest {
-
-    private String userId;
-    private String firstName;
-    private String lastName;
+public class UserLoginRequestModel {
     private String email;
+    private String password;
+
 }

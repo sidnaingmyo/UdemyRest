@@ -1,6 +1,6 @@
-package com.example.demo.Service;
+package com.example.demo.service;
 
-import com.example.demo.Dto.UserDto;
+import com.example.demo.dto.UserDto;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 public interface UserService extends UserDetailsService {
