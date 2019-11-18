@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity(name = "users")
 @Getter @Setter
@@ -36,6 +37,9 @@ public class UserEntity {
 
     @Column(nullable = false)
     private Boolean emailVerificationStatus=false;
+
+    @OneToMany(mappedBy = "userDetails",cascade = CascadeType.ALL   )
+    private List<AddressEntity> address;
 
 
 

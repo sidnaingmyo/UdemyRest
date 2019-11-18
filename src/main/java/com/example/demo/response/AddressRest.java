@@ -5,15 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter @Setter
 @AllArgsConstructor @NoArgsConstructor
-public class UserRest {
+public class AddressRest {
 
-    private String userId;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private List<AddressRest> address;
+    private String addressId;
+    private String city;
+    private String country;
+    private String streetName;
+    private String postalCode;
+    private String type;
 }

@@ -1,13 +1,14 @@
-package com.example.demo.service;
+package com.example.demo.serviceImpl;
 
+import com.example.demo.dto.AddressDto;
 import com.example.demo.dto.UserDto;
 import com.example.demo.entity.UserEntity;
 import com.example.demo.exception.UserServiceException;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.response.ErrorMessages;
-import com.example.demo.response.UserRest;
+import com.example.demo.service.UserService;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.omg.PortableServer.LIFESPAN_POLICY_ID;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -38,17 +39,26 @@ public class UserServiceImpl implements UserService {
 
         if(userRepository.findByEmail(user.getEmail()) != null) throw new RuntimeException("Email already exists");
 
-        UserEntity userEntity=new UserEntity();
-        BeanUtils.copyProperties(user,userEntity);
+        for(int i=0 ; i < user.getAddress().size();i++){
+            AddressDto address=user.getAddress().get(i);
+            address.setUserDetails(user);
+            address.setAddressId(RandomStringUtils.randomAlphanumeric(30));
+            user.getAddress().set(i,address);
+        }
+
+
+//        BeanUtils.copyProperties(user,userEntity);
+
+        ModelMapper modelMapper=new ModelMapper();
+        UserEntity userEntity=modelMapper.map(user,UserEntity.class);
 
         userEntity.setEncryptPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-
         userEntity.setUserId(RandomStringUtils.randomAlphanumeric(10));
 
         UserEntity UserDetailStored=userRepository.save(userEntity);
+//        BeanUtils.copyProperties(UserDetailStored,returnValue);
+        UserDto returnValue=modelMapper.map(UserDetailStored,UserDto.class);
 
-        UserDto returnValue=new UserDto();
-        BeanUtils.copyProperties(UserDetailStored,returnValue);
 
         return returnValue;
     }
