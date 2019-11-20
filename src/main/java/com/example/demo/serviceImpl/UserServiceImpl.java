@@ -7,6 +7,7 @@ import com.example.demo.exception.UserServiceException;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.response.ErrorMessages;
 import com.example.demo.service.UserService;
+import com.example.demo.tokentest.Token;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -52,8 +54,12 @@ public class UserServiceImpl implements UserService {
         ModelMapper modelMapper=new ModelMapper();
         UserEntity userEntity=modelMapper.map(user,UserEntity.class);
 
+
+        String publicUserId=RandomStringUtils.randomAlphanumeric(10);
         userEntity.setEncryptPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        userEntity.setUserId(RandomStringUtils.randomAlphanumeric(10));
+        userEntity.setUserId(publicUserId);
+        userEntity.setEmailVerificationToken(Token.generateEmailVerificationToken(publicUserId));
+        userEntity.setEmailVerificationStatus(false);
 
         UserEntity UserDetailStored=userRepository.save(userEntity);
 //        BeanUtils.copyProperties(UserDetailStored,returnValue);
@@ -131,10 +137,32 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean verifyEmailToken(String token) {
+
+        boolean returnValue=false;
+
+        UserEntity userEntity=userRepository.findUserByEmailVerificationToken(token);
+
+        if(userEntity!=null){
+            boolean hastokenExpired= Token.hastokenExipred(token);
+            if(!hastokenExpired){
+                userEntity.setEmailVerificationToken(null);
+                userEntity.setEmailVerificationStatus(Boolean.TRUE);
+                userRepository.save(userEntity);
+                returnValue=true;
+            }
+        }
+        return returnValue;
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         UserEntity userEntity=userRepository.findByEmail(email);
         if(userEntity==null)throw new UsernameNotFoundException(email);
+//        return new User(userEntity.getEmail(), userEntity.getEncryptPassword()
+//                ,userEntity.getEmailVerificationStatus()
+//                ,true,true, true,new ArrayList<>());
 
-        return new User(userEntity.getEmail(),userEntity.getEncryptPassword(),new ArrayList<>());
+      return new User(userEntity.getEmail(),userEntity.getEncryptPassword(),new ArrayList<>());
     }
 }

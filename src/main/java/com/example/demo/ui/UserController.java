@@ -43,11 +43,11 @@ public class UserController {
 //        BeanUtils.copyProperties(request, userDto);
 
         ModelMapper modelMapper = new ModelMapper();
-         UserDto userDto=modelMapper.map(request,UserDto.class);
+        UserDto userDto = modelMapper.map(request, UserDto.class);
 
 
-         UserDto create=userService.create(userDto);
-         returnvalue =modelMapper.map(create,UserRest.class);
+        UserDto create = userService.create(userDto);
+        returnvalue = modelMapper.map(create, UserRest.class);
 
 //        UserDto create = userService.create(userDto);
 //        BeanUtils.copyProperties(create, returnvalue);
@@ -83,12 +83,12 @@ public class UserController {
         return returnValue;
     }
 
-    @DeleteMapping(path= "/{id}",
-    produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    @DeleteMapping(path = "/{id}",
+            produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
 
-    public OperationStatusModel deleteUser(@PathVariable String id){
+    public OperationStatusModel deleteUser(@PathVariable String id) {
 
-        OperationStatusModel returnValue =new OperationStatusModel();
+        OperationStatusModel returnValue = new OperationStatusModel();
 
         returnValue.setOperationName(RequestOperationName.DELETE.name());
 
@@ -99,16 +99,16 @@ public class UserController {
     }
 
     @GetMapping(produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    public List<UserRest> getUsers(@RequestParam(value = "page",defaultValue = "0")int page,
-                                   @RequestParam(value = "limit",defaultValue = "2")int limit){
+    public List<UserRest> getUsers(@RequestParam(value = "page", defaultValue = "0") int page,
+                                   @RequestParam(value = "limit", defaultValue = "2") int limit) {
 
-        List<UserRest> returnValue =new ArrayList<>();
-        List<UserDto> users=userService.getUsers(page,limit);
+        List<UserRest> returnValue = new ArrayList<>();
+        List<UserDto> users = userService.getUsers(page, limit);
 
-        for(UserDto userDto:users){
-        UserRest userModel=new UserRest();
-        BeanUtils.copyProperties(userDto,userModel);
-        returnValue.add(userModel);
+        for (UserDto userDto : users) {
+            UserRest userModel = new UserRest();
+            BeanUtils.copyProperties(userDto, userModel);
+            returnValue.add(userModel);
         }
 
         return returnValue;
@@ -116,13 +116,13 @@ public class UserController {
 
     //http://localhost:8080/sisnaing/user/efaeaegagew/address
     @GetMapping(path = "/{id}/address", produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    public List<AddressRest> getuserAddress(@PathVariable String id) {
+    public List<AddressRest> getuserAddresses(@PathVariable String id) {
 
 
         List<AddressRest> returnvalue = new ArrayList<>();
-        List<AddressDto> addressDto = addressService.getAddress(id);
+        List<AddressDto> addressDto = addressService.getAddresses(id);
 
-        if(addressDto!=null&&!addressDto.isEmpty()) {
+        if (addressDto != null && !addressDto.isEmpty()) {
             Type listType = new TypeToken<List<AddressRest>>() {
             }.getType();
             ModelMapper modelMapper = new ModelMapper();
@@ -130,5 +130,41 @@ public class UserController {
 
         }
         return returnvalue;
+    }
+
+    @GetMapping(path = "/{userid}/address/{addressId}",
+            produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+
+    public AddressRest getuserAddress(@PathVariable String addressId,@PathVariable String userId) {
+
+        AddressDto addressDto = addressService.getAddress(addressId);
+        ModelMapper modelMapper = new ModelMapper();
+//        Link addresslink=linkTo(methodOn(UserController.class).getUserAddress(userId,AddressId).withSelfRel();
+//        Link userlink=linkTo(UserController.class).slash(userId).withRel("user");
+//        Link addresseslink=linkTo(methodOn(UserController.class).getUserAddress(userId,AddressId).withRel("addresses ");
+//        AddressRest addressRestModel=modelMapper.map(addressDto,AddressRest.class);
+//        addressRestModel.add(addressLink);
+//        addressRestModel.add(userLink);
+//        addressRestModel.add(addressesLink);
+
+        return modelMapper.map(addressDto, AddressRest.class);
+    }
+
+    @GetMapping(path = "/email-verificatoin",
+            produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    public OperationStatusModel verifyEmailToken(@RequestParam(value = "token")String token){
+
+        OperationStatusModel returnValue=  new OperationStatusModel();
+        returnValue.setOperationName(RequestOperationName.VERIFY_EMAIL.name());
+
+        boolean isVerified=userService.verifyEmailToken(token);
+
+        if(isVerified){
+            returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
+        }else {
+            returnValue.setOperationResult(RequestOperationStatus.ERROR.name());
+        }
+        return returnValue;
+
     }
 }
